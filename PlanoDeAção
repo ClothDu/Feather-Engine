@@ -1,0 +1,55 @@
+perfeito, Duda — vamos transformar essa ambição num plano de ataque pragmático, com “defaults rápidos e otimizações por padrão”. Vou dividir em fases, listar um kit mínimo de libs (com alternativas) e dar esqueletos de arquitetura pra 2D e 3D. Dá pra começar sozinha e ir plugando o time depois sem reescrever tudo.
+
+Fase 0 — alicerces (1 repositório, 2 runtimes)
+
+Objetivo: um core comum e dois módulos: runtime2d/ e runtime3d/.
+
+Stack base
+
+Build: CMake
+
+Compiladores: clang/gcc (Linux), MSVC (Windows)
+
+Janela/Input: GLFW (leve) ou SDL2 (mais completo). Eu iria de GLFW + gamepad via gamepaddb (opcional).
+
+Render API:
+
+MVP 2D: OpenGL 4.5 (rápido pra entregar)
+
+MVP 3D: começa em OpenGL 4.5; planeja backend Vulkan depois (render graph).
+
+Math: glm
+
+ECS: entt (rápido, cache-friendly, API excelente)
+
+Jobs: enkiTS (já tá no teu radar)
+
+Log: spdlog
+
+Perf/Profiling: Tracy (captura CPU/GPU/locks), Remotery (opcional)
+
+Serialização: nlohmann::json (simples) — YAML depois se quiser.
+
+Assets:
+
+imagens: stb_image
+
+fontes: freetype (+ msdfgen depois pra texto nítido)
+
+3D: assimp (MVP), futuramente loader próprio + glTF 2.0
+
+Áudio: miniaudio (único header, multiplataforma), ou OpenAL Soft se preferir API clássica.
+
+Física:
+
+2D: Box2D 3.x
+
+3D: Jolt Physics (leve, MIT) ou PhysX (robusto, mais pesado)
+
+Testes: Catch2 ou GoogleTest
+
+CI: GitHub Actions (build + unit tests + sanitizers)
+
+Package manager (dev): vcpkg ou conan (facilita on-boarding da equipe)
+
+Estrutura de pastas
