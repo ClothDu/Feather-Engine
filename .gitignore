@@ -1,0 +1,14 @@
+# Compilados
+*.o
+*.out
+*.a
+*.so
+*.exe
+
+# Diretórios de build
+bin/
+obj/
+
+# Configurações locais
+.vscode/
+.idea/
