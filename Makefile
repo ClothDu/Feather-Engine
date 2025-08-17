@@ -12,7 +12,9 @@ CXXFLAGS = -std=c++17 -Wall \
 LDFLAGS = $(shell pkg-config --libs glfw3 freetype2) \
           -lGL -ldl -lpthread -lopenal \
           -L/usr/local/lib -lbox2d \
-          -L$(HOME)/enkiTS/build -lenkiTS
+          -L$(HOME)/enkiTS/build -lenkiTS \
+          -lassimp \
+          -lBulletDynamics -lBulletCollision -lLinearMath
 
 # Folders
 SRC_DIR = src
