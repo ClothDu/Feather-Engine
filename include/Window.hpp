@@ -4,9 +4,6 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
-static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-
 class Window {
     private:
         GLFWwindow *window;
