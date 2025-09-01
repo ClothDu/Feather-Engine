@@ -3,7 +3,6 @@
 #include <iostream>
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
 }
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -25,13 +24,6 @@ Window::Window(int w, int h, const std::string &n) : window(nullptr), width(w), 
     }
     
     glfwMakeContextCurrent(window);
-    int version = gladLoadGL(glfwGetProcAddress);
-    if (version == 0) {
-        throw std::runtime_error("error to intialize openGL context");
-    } else {
-        std::cout << "sucefully load openGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << std::endl;
-    }
-    glViewport(0, 0, width, heigth);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwSetKeyCallback(window, key_callback);
 }

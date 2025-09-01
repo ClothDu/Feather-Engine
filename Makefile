@@ -1,102 +1,44 @@
-# ----------------------------
-# Compiler and flags
-# ----------------------------
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Iinclude -I/usr/include -I/usr/local/include \
-        	-Iexternal/imgui-master -Iexternal/imgui-master/backends \
-        	-MMD -MP
+# Variáveis do compilador
+CXX := g++
+CXXFLAGS := -std=c++17 -Wall -Iinclude \
+            -Iexternal/glm-0.9.9 \
+            -Iexternal/glfw/include \
+            -Iexternal/box2d/include \
+            -Iexternal/bullet3/src \
+            -Iexternal/enkiTS/include \
+            -Iexternal/assimp/include
 
-DEBUGFLAGS = -g -O0
-RELEASEFLAGS = -O3
+SRC := $(wildcard src/*.cpp)
+OBJ := $(patsubst src/%.cpp,obj/%.o,$(SRC))
+TARGET := bin/main
 
-# ----------------------------
-# Linking
-# ----------------------------
-LDFLAGS = $(shell pkg-config --libs glfw3 freetype2) \
-        	-lGL -ldl -lpthread -lopenal \
-        	-lbox2d -lBulletDynamics -lBulletCollision -lLinearMath \
-        	-lassimp
+# Função para buscar todos os .a recursivamente e filtrar exemplos/testes/macOS
+define find_libs
+$(shell find $1 -name "*.a" ! -path "*/examples/*" ! -path "*/test/*" ! -path "*/osx64/*")
+endef
 
-# ----------------------------
-# Folders
-# ----------------------------
-SRC_DIR = src
-OBJ_DIR = obj
-BIN_DIR = bin
-TARGET = $(BIN_DIR)/main
+GLFW_LIBS := $(call find_libs,external/glfw)
+BOX2D_LIBS := $(call find_libs,external/box2d)
+BULLET_LIBS := $(call find_libs,external/bullet3)
+BGFX_LIBS := $(call find_libs,external/bgfx)
+ENKITS_LIBS := $(call find_libs,external/enkiTS)
+ASSIMP_LIBS := $(call find_libs,external/assimp)
 
-# ----------------------------
-# Sources
-# ----------------------------
-SRC := $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*.c) \
-    	$(wildcard external/imgui-master/*.cpp) \
-    	$(wildcard external/imgui-master/backends/*.cpp)
+LDFILES := $(GLFW_LIBS) $(BOX2D_LIBS) $(BULLET_LIBS) $(BGFX_LIBS) $(ENKITS_LIBS) $(ASSIMP_LIBS)
 
-# ----------------------------
-# Objects
-# ----------------------------
-OBJ := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(notdir $(SRC)))
-OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(OBJ))
-
-# ----------------------------
-# Dependencies
-# ----------------------------
-DEPS := $(OBJ:.o=.d)
--include $(DEPS)
-
-# ----------------------------
-# Default target
-# ----------------------------
+# Regras
 all: $(TARGET)
 
-# ----------------------------
-# Build target
-# ----------------------------
 $(TARGET): $(OBJ)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(OBJ) -o $(TARGET) $(LDFLAGS)
+	@mkdir -p bin
+	$(CXX) $(OBJ) -o $(TARGET) $(LDFILES)
 
-# ----------------------------
-# Object compilation
-# ----------------------------
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $< -o $@
+obj/%.o: src/%.cpp
+	@mkdir -p obj
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: external/imgui-master/%.cpp
-	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.o: external/imgui-master/backends/%.cpp
-	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $< -o $@
-
-# ----------------------------
-# Run
-# ----------------------------
-run: all
+run: $(TARGET)
 	./$(TARGET)
 
-# ----------------------------
-# Debug and Release builds
-# ----------------------------
-debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: clean all
-
-release: CXXFLAGS += $(RELEASEFLAGS)
-release: clean all
-
-# ----------------------------
-# Clean
-# ----------------------------
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
-
-# ----------------------------
-# Aliases
-# ----------------------------
-.PHONY: all run clean debug release
+	rm -rf obj/*.o $(TARGET)
